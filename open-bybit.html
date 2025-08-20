@@ -1,55 +1,21 @@
 <!DOCTYPE html>
 <html lang="ko">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width,initial-scale=1">
-  <!-- Bybit로 빨리 연결되게 사전 준비 -->
-  <meta http-equiv="x-dns-prefetch-control" content="on">
-  <link rel="dns-prefetch" href="//www.bybit.com">
-  <link rel="preconnect" href="https://www.bybit.com" crossorigin>
-  <title>Bybit 연결 준비…</title>
-  <script>
-    // URL의 ?symbol=BEAMUSDT 같은 파라미터에서 심볼 읽기
-    function getSymbol(){
-      const p = new URLSearchParams(location.search);
-      const s = (p.get('symbol')||'').toUpperCase().replace(/[^A-Z0-9]/g,'');
-      return s || 'BTCUSDT';
-    }
-    const symbol = getSymbol();
-    const target = `https://www.bybit.com/trade/usdt/${symbol}`;
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Open Bybit</title>
+<script>
+  (function () {
+    const p = new URLSearchParams(location.search);
+    const sym = (p.get('symbol') || 'BTCUSDT').toUpperCase().replace(/[^A-Z0-9]/g, '');
+    const url = `https://www.bybit.com/trade/usdt/${sym}`;
 
-    function goNow(){ location.replace(target); } // 준비 후 자동 이동
+    // 핵심: 항상 같은 이름의 창/탭('BYBITTAB')으로 연다 → 기존 탭 재사용
+    window.open(url, 'BYBITTAB');
 
-    // 가능하면 미리 받아놓기(캐시 예열)
-    function warmup(){
-      try{
-        const nc = navigator.connection;
-        if (nc && (nc.saveData || /2g/.test(nc.effectiveType||''))) return; // 느린망/절약모드면 스킵
-        const l = document.createElement('link');
-        l.rel  = 'prefetch';
-        l.as   = 'document';
-        l.href = target;
-        document.head.appendChild(l);
-      }catch(e){}
-    }
-
-    document.addEventListener('DOMContentLoaded', () => {
-      warmup();
-      setTimeout(goNow, 180); // 약 0.18초 워밍업 후 자동 이동
-    });
-  </script>
-  <style>
-    body{margin:0;display:flex;min-height:100dvh;align-items:center;justify-content:center;
-         font-family:system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif}
-    .card{padding:18px 22px;border:1px solid #ddd;border-radius:14px;box-shadow:0 2px 8px rgba(0,0,0,.06)}
-    .btn{margin-top:10px;padding:10px 14px;border:0;border-radius:10px;cursor:pointer}
-  </style>
-</head>
-<body>
-  <div class="card">
-    <div><b>Bybit</b> 열 준비 중… (<span id="sym"></span>)</div>
-    <button class="btn" onclick="location.replace(`https://www.bybit.com/trade/usdt/${getSymbol()}`)">지금 바로 열기</button>
-  </div>
-  <script>document.getElementById('sym').textContent = getSymbol();</script>
-</body>
+    // 이 중간 페이지는 닫기(인앱 웹뷰에선 무시될 수 있어 fallback도 둠)
+    try { window.close(); } catch (e) {}
+    setTimeout(() => location.href = url, 400);
+  })();
+</script>
+<body>열리는 중…</body>
 </html>
